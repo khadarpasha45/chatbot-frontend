@@ -11,14 +11,14 @@ const Chatbot = () => {
             // Add the query to the history
             setQueryHistory([...queryHistory, query]);
             // Mock response for now, in a real scenario an API call would go here
-            setResponse(`Response to "${query}"`);
+            setResponse(`${query}`);
             setQuery(''); // Clear the query after submission
         }
     };
 
     return (
         <div className="chatbot-container">
-            {/* Sidebar showing query history */}
+            {/*this side bar is to store the previous queries*/}
             <div className="sidebar">
                 <h3>Previous Queries</h3>
                 <ul>
@@ -28,8 +28,9 @@ const Chatbot = () => {
                 </ul>
             </div>
 
-            {/* Main chat interface */}
+            {/* this is the Main chat interface */}
             <div className="chatbox">
+                    {response && <div className="response">{response}</div>}
                 <div className="search-bar">
                     <input
                         type="text"
@@ -37,9 +38,8 @@ const Chatbot = () => {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
-                    <button onClick={handleSearch}>Go</button>
+                    {<button onClick={handleSearch}>Go</button>}
                 </div>
-                {response && <div className="response">{response}</div>}
             </div>
         </div>
     );

@@ -72,11 +72,16 @@
 }
 
 .response {
+    width: 75%; /* Fixed width matching the search bar */
+    max-height: 50%; /* Optional: Limit the maximum height for readability */
+    overflow-y: auto; /* Enable scrolling if content overflows */
     font-size: 16px;
     color: #333;
-    margin-top: 10px;
+    margin-bottom: 20px; /* Space between response and search bar */
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
+    word-wrap: break-word; /* Ensure long words break into the next line */
+    box-sizing: border-box;
 }
