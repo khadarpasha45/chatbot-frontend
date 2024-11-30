@@ -1,91 +1,125 @@
-import React, { useState } from "react";
-import "./Chatbot.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import './Chatbot.css';
 
-function ChatInterface() {
+const Chatbot = () => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState("");
-    const [history, setHistory] = useState([]);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [inputValue, setInputValue] = useState('');
+    const [chatHistory, setChatHistory] = useState([]);
+    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+    
+    const navigate = useNavigate(); // Initialize the navigate function
 
     const handleSend = () => {
-        if (input.trim() !== "") {
-            const userMessage = { sender: "user", text: input };
-            const botResponse = {
-                sender: "bot",
-                text: "This is a placeholder response.",
-            };
+        if (inputValue.trim()) {
+            const newMessages = [
+                ...messages,
+                { type: 'user', text: inputValue },
+                { type: 'bot', text: `Response to: ${inputValue}` }
+            ];
 
-            // Update messages with both userMessage and botResponse
-            setMessages((prevMessages) => [...prevMessages, userMessage, botResponse]);
-
-            // Add the input to the history
-            setHistory((prevHistory) => [...prevHistory, input]);
-
-            // Clear the input
-            setInput("");
+            setMessages(newMessages);
+            setChatHistory([...chatHistory, inputValue]);
+            setInputValue('');
         }
     };
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    const clearChats = () => {
-        setMessages([]);  // Clear the messages
-        setHistory([]);   // Clear the history
+    const handleLogout = () => {
+        // You can add logic to clear session or token here if necessary
+        navigate('/login'); // Navigate to the login page when logged out
     };
 
     return (
-        <div className="chat-container">
-            <aside className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
-                {isSidebarOpen && (
-                    <>
-                        <h2>History</h2>
-                        <ul>
-                            {history.map((item, index) => (
-                                <li key={index}>{item}</li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-            </aside>
-            <button
-                className={`toggle-sidebar-btn ${isSidebarOpen ? "open" : "closed"}`}
-                onClick={toggleSidebar}
+        <div className="chatbot-container">
+            {/* Sidebar */}
+            <div
+                className={`sidebar ${isSidebarOpen ? 'open' : ''}`}
+                onMouseEnter={() => setIsSidebarOpen(true)}
+                onMouseLeave={() => setIsSidebarOpen(false)}
             >
-                ☰
-            </button>
-            {/* New Chat Button - Replacing the Trash Icon */}
-            <button
-                className={`clear-chat-btn ${isSidebarOpen ? "open" : "closed"}`}
-                onClick={clearChats}
-            >
-                💬 {/* New Chat Icon */}
-            </button>
-            <div className="chat-content">
-                <div className="chat-messages">
+                <div className="sidebar-header">
+                    <h2>Chat History</h2>
+                    <div className="sidebar-buttons">
+                        <button
+                            onClick={() => {
+                                setMessages([]);
+                                setInputValue('');
+                            }}
+                            title="Start New Chat"
+                        >
+                            ➕
+                        </button>
+                    </div>
+                </div>
+                <div className="chat-history">
+                    {chatHistory.map((item, index) => (
+                        <div key={index} className="history-item">
+                            {item}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Main Chat Area */}
+            <div className={`chat-area ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                {/* User Dropdown */}
+                <div className="user-area">
+                    <div
+                        className="user-icon"
+                        onMouseEnter={() => setIsUserDropdownOpen(true)}
+                        onMouseLeave={() => setIsUserDropdownOpen(false)}
+                    >
+                        👤
+                        {isUserDropdownOpen && (
+                            <div className="user-dropdown">
+                                <button onClick={handleLogout}>Logout</button> {/* Logout Button */}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Messages Area */}
+                <div className="messages-container">
                     {messages.map((msg, index) => (
                         <div
                             key={index}
-                            className={`chat-message ${msg.sender}`}
-                            style={{ maxWidth: "40%", wordWrap: "break-word" }}
+                            className={`message ${msg.type}`}
                         >
                             {msg.text}
                         </div>
                     ))}
                 </div>
-                <div className="chat-input">
-                    <textarea
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your message..."
-                        rows={1}
-                    />
-                    <button onClick={handleSend}>Send</button>
+
+                {/* Input Area */}
+                <div className="input-area">
+                    <div className="search-wrapper">
+                        <textarea
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onInput={(e) => {
+                                e.target.style.height = "50px"; // Reset height
+                                e.target.style.height = `${e.target.scrollHeight}px`; // Adjust height dynamically
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault(); // Prevent newline creation
+                                    handleSend(); // Call send function
+                                }
+                            }}
+                            placeholder="Type your message..."
+                        />
+                        <button
+                            className="send-button"
+                            onClick={handleSend}
+                        >
+                            ➤
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
-}
+};
 
-export default ChatInterface;
+export default Chatbot;
